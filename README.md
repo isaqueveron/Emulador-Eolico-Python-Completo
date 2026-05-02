@@ -122,6 +122,9 @@ Comparação entre as grandezas medidas no sensor físico e as previstas pela si
 Análise do coeficiente de potência ($C_p$) em função da razão de velocidade de ponta ($\lambda$).
 ![Eficiência Aerodinâmica](./Eficiência_Aerodinâmica.png)
 
+### 4. Perfil de Vento Simulado
+Perfil de vento gerado e utilizado como input para o Modelo digital e o Emulador.
+![Perfil de Vento Simulado](./Perfil de Vento Simulado.png)
 -----
 
 ## Contato
