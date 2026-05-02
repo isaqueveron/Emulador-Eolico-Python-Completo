@@ -124,7 +124,7 @@ Análise do coeficiente de potência ($C_p$) em função da razão de velocidade
 
 ### 4. Perfil de Vento Simulado
 Perfil de vento gerado e utilizado como input para o Modelo digital e o Emulador.
-![Perfil de Vento Simulado](./Perfil de Vento Simulado.png)
+![Perfil de Vento Simulado](./Perfil_de_Vento_Simulado.png)
 -----
 
 ## Contato
