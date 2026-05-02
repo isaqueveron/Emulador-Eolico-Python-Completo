@@ -9,7 +9,7 @@
 
 ## Visão Geral
 
-O projeto `Emulador-Eolico-Python-Completo` é um ecossistema de software em Python projetado para transformar uma bancada de motores em um **Emulador de Turbina Eólica de Alta Fidelidade**. Ele integra um modelo matemático dinâmico de uma turbina eólica (Gêmeo Digital) com hardware físico através de comunicação serial em tempo real. 
+O projeto `Emulador-Eolico-Python-Completo` é um ecossistema de software em Python projetado para transformar uma bancada de motores em um **Emulador de Turbina Eólica de Alta Fidelidade**. Ele e composto por um modelo matemático dinâmico de uma turbina eólica (Gêmeo Digital) e um hardware físico integrados através de comunicação serial em tempo real. 
 
 O sistema permite a emulação de diferentes perfis de vento e o estudo do comportamento mecânico e elétrico de aerogeradores, abstraindo a complexidade do controle de hardware e da integração numérica para o pesquisador.
 
@@ -42,9 +42,9 @@ A robustez da emulação depende da integração direta com os componentes físi
 ## Funcionalidades Implementadas
 
 ### 1. Núcleo de Simulação Digital
-* **Solução Numérica RK4**: Implementação do método de Runge-Kutta de 4ª ordem para integração das equações diferenciais de velocidade e corrente.
-* **Modelo de Coeficiente de Potência ($C_p$)**: Suporte a modelos matemáticos de eficiência aerodinâmica baseados em $\lambda$ (Tip-Speed Ratio).
-* **Dinâmica de Transmissão**: Modelagem incluindo inércia da turbina, inércia do gerador e relação de caixa de engrenagens.
+* **Solução Numérica RK4**: Implementação do método de Runge-Kutta de 4ª ordem para integração das equações diferenciais de velocidade e corrente de armadura.
+* **Modelo de Coeficiente de Potência ($C_p$)**: Suporte a dois modelos matemáticos de eficiência aerodinâmica baseados em $\lambda$ (Tip-Speed Ratio).
+* **Dinâmica de Transmissão**: Modelagem incluindo inércia da turbina, inércia do gerador, relação de caixa de engrenagens, parametros eletricos do gerador e coeficientes de atrito dinâmico.
 
 ### 2. Sincronização HIL e Multimalhas de Tempo
 * **Multimalhas de Tempo**: O sistema opera com duas malhas temporais distintas e sincronizadas: uma Malha Digital (20ms), responsável por resolver a física da turbina via Runge-Kutta, e uma Malha de Hardware (1ms), dedicada à comunicação serial e controle de torque.
