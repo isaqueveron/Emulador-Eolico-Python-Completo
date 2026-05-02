@@ -70,6 +70,25 @@ A robustez da emulação depende da integração direta com os componentes físi
 
 -----
 
+## Resultados de Emulação
+
+Abaixo estão os resultados obtidos pela bancada, demonstrando a fidelidade entre o modelo matemático e o comportamento do hardware físico:
+
+### 1. Seguimento de Hardware (Torque)
+Validação da capacidade do inversor em seguir a referência de torque calculada pelo modelo virtual.
+![Seguimento de Hardware](./Seguimento_de_Hardware.png)
+
+### 2. Validação de Potência e Velocidade
+Comparação entre as grandezas medidas no sensor físico e as previstas pela simulação digital.
+![Validação de Potência](./Validação_Potência.png)
+![Validação de Velocidade](./Validação_Velocidade_Angular.png)
+
+### 3. Eficiência Aerodinâmica
+Análise do coeficiente de potência ($C_p$) em função da razão de velocidade de ponta ($\lambda$).
+![Eficiência Aerodinâmica](./Eficiência_Aerodinâmica.png)
+
+-----
+
 ## Contato
 
 * **Isaque Verona** - [GitHub Profile](https://github.com/isaqueveron)
@@ -83,6 +102,3 @@ A robustez da emulação depende da integração direta com os componentes físi
 * Modelagem Dinâmica de Turbinas Eólicas de Velocidade Variável.
 
 **Key-words:** wind turbine, HIL, PID, anti-windup, WEG CFW11, torque sensor, emulação, tempo real.
-
-**Updates:**
-* **v2.0 (Abril/2026):** Integração completa dos drivers de hardware com loop de controle fechado e interface gráfica em tempo real.
