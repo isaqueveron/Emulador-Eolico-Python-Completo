@@ -110,7 +110,7 @@ Análise do coeficiente de potência ($C_p$) em função da razão de velocidade
 Para comprovar o conceito HIL e validar o seguimento, o parametro $\lambda_{opt}$ do modelo matemático virtual foi intencionalmente modificado (degradando a eficiência do "MPPT" virtual). Com essa abordagem, o Gêmeo Digital foi forçado a apresentar o mesmo rendimento subótimo da planta real, demonstrando que a bancada é capaz de emular com precisão o cenário físico real, inclusive suas ineficiências paramétricas.
 
 ### 1. Seguimento de Hardware (Torque)
-Validação da capacidade do inversor em seguir a referência de torque calculada pelo modelo virtual.
+Validação da capacidade do inversor em seguir a referência de torque calculada pelo modelo estático de eficiência aerodinâmica.
 ![Seguimento de Hardware](./Seguimento_de_Hardware.png)
 
 ### 2. Validação de Potência e Velocidade
