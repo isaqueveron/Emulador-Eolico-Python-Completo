@@ -1,21 +1,3 @@
----
-
-## Contato
-
-*   **Isaque Verona** - [GitHub Profile](https://github.com/isaque-verona)
-
----
-
-## Referências
-
-*   [Lorenz Messtechnik - Protocolo de Comunicação](http://www.shintron.com.tw/proimages/a3-2/Protocol.pdf)
-*   [Interface Inc - Manual T25](https://www.sensor.com.tw/upload/files/lorenz/operation%20manual/090231e_DR-2112_2212_2412_2512.pdf)
-
----
-
-**Atualizações:**
-*   **11/jul/25**: Versão profissional, orientada a objetos e documentada (Masterpiece)Aqui está o código Markdown para o seu arquivo `README.md`, estruturado exatamente como o exemplo fornecido e contendo todas as informações técnicas da biblioteca `LCTSfunctions`:
-```markdown
 # Biblioteca de Comunicação do Transdutor de Torque Rotativo (`LCTSfunctions`)
 
 [![Python](https://img.shields.io/badge/python-3.x-blue.svg)](https://www.python.org/)
