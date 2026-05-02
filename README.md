@@ -85,9 +85,29 @@ O núcleo do emulador opera em malha fechada para garantir que o hardware físic
 
 -----
 
-## Resultados de Emulação
+## Resultados de Emulação e Análise Crítica
 
-Abaixo estão os resultados obtidos pela bancada, demonstrando a fidelidade entre o modelo matemático e o comportamento do hardware físico:
+Abaixo estão os resultados obtidos pela bancada. Para a interpretação correta das curvas, é fundamental compreender a arquitetura elétrica da planta física: a extração de potência é realizada por um inversor híbrido monofásico (conectado ao retificador do gerador), o qual possui um algoritmo de MPPT próprio embarcado.
+
+O comportamento deste equipamento físico dita a dinâmica de resposta do sistema emulado, como detalhado a seguir.
+
+### 1. Seguimento de Hardware (Torque)
+
+Validação da capacidade do inversor da bancada (motor) em seguir a referência de torque calculada pelo modelo virtual.
+
+**Análise do Atraso de Extração:** Observa-se uma discrepância inicial entre o torque calculado pelo modelo e o torque medido na planta real. O modelo digital inicia a extração de potência imediatamente; no entanto, o inversor híbrido físico exige um tempo de processamento e estabilização da rede. É possível notar que somente após os 50 segundos o MPPT do inversor "fecha a chave" e começa a extrair potência efetivamente. A partir desse momento, o torque físico sobe e o rastreamento (HIL) converge com alta fidelidade.
+
+### 2. Validação de Potência e Velocidade
+
+Comparação entre as grandezas medidas no sensor físico (Torquímetro T25) e as previstas pela simulação digital contínua.
+
+### 3. Eficiência Aerodinâmica ($C_p$) e Degradação do Modelo
+
+Análise do coeficiente de potência ($C_p$) em função da razão de velocidade de ponta ($\lambda$).
+
+**Análise do MPPT Físico e Ajuste do Gêmeo Digital:** Os dados demonstram que o coeficiente de potência ($C_p$) da planta é baixo, indicando que o algoritmo de MPPT embarcado no inversor comercial está mal ajustado para a dinâmica otimizada desta turbina eólica, operando fora da região ideal de extração.
+
+Para comprovar o conceito HIL e validar o seguimento, o parametro $\lambda_otimo$ do modelo matemático virtual foi intencionalmente modificado (degradando a eficiência do "MPPT" virtual). Com essa abordagem, o Gêmeo Digital foi forçado a apresentar o mesmo rendimento subótimo da planta real, demonstrando que a bancada é capaz de emular com precisão o cenário físico real, inclusive suas ineficiências paramétricas.
 
 ### 1. Seguimento de Hardware (Torque)
 Validação da capacidade do inversor em seguir a referência de torque calculada pelo modelo virtual.
