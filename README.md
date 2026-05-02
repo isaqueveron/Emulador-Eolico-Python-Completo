@@ -1,6 +1,6 @@
 -----
 
-# Emulador de Turbina Eólica: Bancada de Ensaios em Tempo Real (`WindSimHIL`)
+# Emulador de Turbina Eólica: Bancada de Ensaios em Tempo Real (`Emulador-Eolico-Python-Completo`)
 
 [](https://www.python.org/)
 [](https://opensource.org/licenses/MIT)
@@ -9,7 +9,7 @@
 
 ## Visão Geral
 
-O projeto `WindSimHIL` é um ecossistema de software em Python projetado para transformar uma bancada de motores em um **Emulador de Turbina Eólica de Alta Fidelidade**. Ele integra um modelo matemático dinâmico de uma turbina eólica (Gêmeo Digital) com hardware físico através de comunicação serial em tempo real. 
+O projeto `Emulador-Eolico-Python-Completo` é um ecossistema de software em Python projetado para transformar uma bancada de motores em um **Emulador de Turbina Eólica de Alta Fidelidade**. Ele integra um modelo matemático dinâmico de uma turbina eólica (Gêmeo Digital) com hardware físico através de comunicação serial em tempo real. 
 
 O sistema permite a emulação de diferentes perfis de vento e o estudo do comportamento mecânico e elétrico de aerogeradores, abstraindo a complexidade do controle de hardware e da integração numérica para o pesquisador.
 
