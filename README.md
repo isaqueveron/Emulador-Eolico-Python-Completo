@@ -41,16 +41,16 @@ A robustez da emulação depende da integração direta com os componentes físi
 
 ## Funcionalidades Implementadas
 
-### 1. Núcleo de Simulação Digital (`modelo_aerogerador.py`)
+### 1. Núcleo de Simulação Digital
 * **Solução Numérica RK4**: Implementação do método de Runge-Kutta de 4ª ordem para integração das equações diferenciais de velocidade e corrente.
 * **Modelo de Coeficiente de Potência ($C_p$)**: Suporte a modelos matemáticos de eficiência aerodinâmica baseados em $\lambda$ (Tip-Speed Ratio).
 * **Dinâmica de Transmissão**: Modelagem incluindo inércia da turbina, inércia do gerador e relação de caixa de engrenagens.
 
-### 2. Algoritmos de Controle (`pid_module.py`)
-* **Controlador PID com Anti-Windup**: Utiliza *integração condicional* para evitar a saturação do termo integral, garantindo que o sistema não "oscile" ao atingir os limites físicos do inversor.
-* **Sincronização HIL**: Gerenciamento de tempos distintos entre o passo de simulação digital e o passo de comunicação serial.
+### 2. Sincronização HIL e Multimalhas de Tempo
+* **Multimalhas de Tempo**: O sistema opera com duas malhas temporais distintas e sincronizadas: uma Malha Digital (20ms), responsável por resolver a física da turbina via Runge-Kutta, e uma Malha de Hardware (1ms), dedicada à comunicação serial e controle de torque.
+* **Sincronização HIL**: A estratégia de tempo real é garantida pelo uso de cronômetros de alta precisão que gerenciam o thread principal, assegurando que o processamento matemático e as chamadas de I/O (inversor e torquímetro) ocorram dentro de janelas temporais fixas, evitando o acúmulo de atrasos (jitter) e garantindo o determinismo necessário para a emulação HIL.
 
-### 3. Interface e Logs (`main.py` & `init_serial_devices.py`)
+### 3. Interface e Logs
 * **Auto-Detecção Serial**: Varredura automática de portas COM para facilitar a conexão dos dispositivos.
 * **Logger de Dados**: Registro otimizado com `numpy` de todas as variáveis (Torque, RPM, Potência e Erro).
 * **Visualização Dinâmica**: Plotagem em tempo real de Referência vs. Medição Real via `matplotlib`.
