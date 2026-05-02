@@ -57,6 +57,21 @@ A robustez da emulação depende da integração direta com os componentes físi
 
 -----
 
+## Estratégias de Controle e Soft-Start
+
+Para garantir a integridade mecânica da bancada e a fidelidade da emulação, o sistema utiliza malhas de controle avançadas e rotinas de segurança:
+
+### 1. Rotina de Soft-Start
+Antes de iniciar a emulação dinâmica, o sistema executa um procedimento de **Soft-Start**. Esta etapa acelera o motor de forma controlada e gradual até a condição de operação inicial, evitando picos de corrente e sobrecarga mecânica (trancos) no acoplamento e no torquímetro. A emulação só é liberada após a estabilização das variáveis de estado.
+
+### 2. Malhas de Controle (Seguimento de Torque)
+O núcleo do emulador opera em malha fechada para garantir que o hardware físico se comporte como a turbina virtual:
+* **Feedback em Tempo Real:** O torque real medido pelo sensor T25 é comparado instantaneamente com o torque calculado pelo modelo matemático.
+* **Compensação Dinâmica:** O erro entre o torque virtual e o real é processado pelo controlador PID, que ajusta a referência enviada ao inversor CFW11.
+* **Anti-Windup:** Como o inversor possui limites físicos de atuação, o controle utiliza integração condicional (Anti-Windup) para evitar que o erro acumulado cause instabilidade ou sobressinal excessivo.
+
+-----
+
 ## Estrutura do Repositório
 
 | Arquivo | Função Principal |
