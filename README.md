@@ -23,22 +23,37 @@ A lógica implementada garante que o torque medido no eixo físico siga o torque
 
 -----
 
+## Drivers de Comunicação e Integração de Hardware
+
+A robustez da emulação depende da integração direta com os componentes físicos através de drivers de baixo nível desenvolvidos especificamente para este protocolo:
+
+### 1. Driver do Inversor de Frequência (`LCINVfunctions`)
+* **Hardware:** WEG CFW11.
+* **Papel no Projeto:** Atua como o **atuador** do sistema. O driver converte as referências de velocidade angular calculadas pelo modelo virtual em telegramas de bytes (baseados em STX/ETX e BCC) que o inversor compreende.
+* **Uso:** É utilizado para enviar comandos de *setpoint* de velocidade e monitorar o status de operação do motor que simula o rotor eólico.
+
+### 2. Driver do Transdutor de Torque (`LCTSfunctions`)
+* **Hardware:** Interface Inc. T25 (ou Lorenz Messtechnik).
+* **Papel no Projeto:** Atua como o **sensor de feedback**. Ele realiza a leitura em tempo real do torque e do RPM efetivos no eixo da bancada.
+* **Uso:** O driver abstrai o protocolo proprietário de telegramas binários, entregando valores decimais limpos para o controlador PID, permitindo o ajuste dinâmico da carga e a verificação da potência mecânica real.
+
+-----
+
 ## Funcionalidades Implementadas
 
 ### 1. Núcleo de Simulação Digital (`modelo_aerogerador.py`)
-* **Solução Numérica RK4**: Implementação do método de Runge-Kutta de 4ª ordem para integração das equações diferenciais de velocidade angular e corrente.
-* **Modelo de Coeficiente de Potência ($C_p$)**: Suporte a múltiplos modelos matemáticos de eficiência aerodinâmica baseados em $\lambda$ (Tip-Speed Ratio).
-* **Dinâmica de Transmissão**: Modelagem completa incluindo inércia da turbina, inércia do gerador, coeficientes de atrito viscoso e relação de caixa de engrenagens.
-* **Cálculo de Perdas**: Estimativa em tempo real de perdas por efeito Joule e perdas mecânicas.
+* **Solução Numérica RK4**: Implementação do método de Runge-Kutta de 4ª ordem para integração das equações diferenciais de velocidade e corrente.
+* **Modelo de Coeficiente de Potência ($C_p$)**: Suporte a modelos matemáticos de eficiência aerodinâmica baseados em $\lambda$ (Tip-Speed Ratio).
+* **Dinâmica de Transmissão**: Modelagem incluindo inércia da turbina, inércia do gerador e relação de caixa de engrenagens.
 
 ### 2. Algoritmos de Controle (`pid_module.py`)
-* **Controlador PID com Anti-Windup**: Implementação robusta que utiliza *integração condicional* para evitar a saturação do termo integral quando a saída atinge os limites de tensão/corrente do hardware.
-* **Sincronização HIL**: Gerenciamento de tempos distintos entre o passo de simulação digital e o passo de comunicação com o hardware.
+* **Controlador PID com Anti-Windup**: Utiliza *integração condicional* para evitar a saturação do termo integral, garantindo que o sistema não "oscile" ao atingir os limites físicos do inversor.
+* **Sincronização HIL**: Gerenciamento de tempos distintos entre o passo de simulação digital e o passo de comunicação serial.
 
-### 3. Gerenciamento de Hardware e Dados (`main.py` & `init_serial_devices.py`)
-* **Auto-Detecção Serial**: Interface amigável para listagem e seleção de portas COM para o inversor e o torquímetro.
-* **Logger de Dados**: Classe `RegistroDeEmulacao` otimizada com `numpy` para armazenar todas as variáveis de estado (torque, potência, velocidade, erro de controle) sem perda de performance.
-* **Visualização Dinâmica**: Plotagem em tempo real utilizando `matplotlib` para monitoramento de torque de referência vs. torque real e potência de saída.
+### 3. Interface e Logs (`main.py` & `init_serial_devices.py`)
+* **Auto-Detecção Serial**: Varredura automática de portas COM para facilitar a conexão dos dispositivos.
+* **Logger de Dados**: Registro otimizado com `numpy` de todas as variáveis (Torque, RPM, Potência e Erro).
+* **Visualização Dinâmica**: Plotagem em tempo real de Referência vs. Medição Real via `matplotlib`.
 
 -----
 
@@ -47,16 +62,27 @@ A lógica implementada garante que o torque medido no eixo físico siga o torque
 | Arquivo | Função Principal |
 | :--- | :--- |
 | `main.py` | Orquestrador do loop principal, interface gráfica e logs. |
+| `driver_inversor_cfw11.py` | Driver de comunicação com o inversor WEG. |
+| `driver_torquimetro.py` | Driver de comunicação com o sensor de torque T25. |
 | `modelo_aerogerador.py` | Motor de física da turbina e do gerador elétrico. |
 | `pid_module.py` | Lógica de controle PID com proteção de saturação. |
-| `init_serial_devices.py` | Utilitário de inicialização e varredura de portas seriais. |
-| `parametros.py` | Centralização de todas as constantes físicas e de controle. |
+| `init_serial_devices.py` | Utilitário de inicialização de portas seriais. |
 
 -----
 
-## Como Utilizar
+## Contato
 
-1. **Configuração de Hardware**: Certifique-se de que o inversor e o torquímetro estão conectados.
-2. **Dependências**:
-   ```bash
-   pip install numpy matplotlib pyserial
+* **Isaque Verona** - [GitHub Profile](https://github.com/isaqueveron)
+
+-----
+
+## Referências
+
+* Manual de Comunicação Serial WEG CFW11.
+* Protocolo de Comunicação Transdutores de Torque Interface Inc.
+* Modelagem Dinâmica de Turbinas Eólicas de Velocidade Variável.
+
+**Key-words:** wind turbine, HIL, PID, anti-windup, WEG CFW11, torque sensor, emulação, tempo real.
+
+**Updates:**
+* **v2.0 (Abril/2026):** Integração completa dos drivers de hardware com loop de controle fechado e interface gráfica em tempo real.
