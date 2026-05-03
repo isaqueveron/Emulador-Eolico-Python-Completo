@@ -165,7 +165,7 @@ O controle de torque utiliza uma malha de velocidade variável com limites rígi
 | :--- | :--- | :--- |
 | `KP`, `KI`, `KD` | **500, 300, 0.0** | Ganhos sintonizados para o seguimento de torque. |
 | `LIMITE_SUPERIOR` | **1000.0 RPM** | Limite superior de saturacao (Anti-Windup). |
-| `LIMITE_SUPERIOR` | **0.0 RPM** | Limite inferior de saturacao (Anti-Windup). |
+| `LIMITE_INFERIOR` | **0.0 RPM** | Limite inferior de saturacao (Anti-Windup). |
 | `TORQUE_MAX_MOTOR` | **79.63 Nm** | Limite físico de segurança do motor de indução. |
 | `TAU_FILTRO_U_INVERSOR` | **0.1 s** | Constante tempo do filtro passa-baixa que filtra o sinal de controle. |
 
