@@ -36,9 +36,15 @@ class RegistroDeEmulacao:
 
 def calcular_velocidade_vento_degraus(tempo_decorrido_segundos):
     if tempo_decorrido_segundos < 10.0: return 0.0
-    if tempo_decorrido_segundos < 30.0: return 3.0
-    if tempo_decorrido_segundos < 50.0: return 4.0
-    return 5.0
+    if tempo_decorrido_segundos < 30.0: return 2.0
+    if tempo_decorrido_segundos < 50.0: return 3.0
+    if tempo_decorrido_segundos < 70.0: return 4.0
+    if tempo_decorrido_segundos < 90.0: return 5.0
+    if tempo_decorrido_segundos < 110.0: return 6.0
+    if tempo_decorrido_segundos < 130.0: return 7.0
+    if tempo_decorrido_segundos < 150.0: return 4.0
+    if tempo_decorrido_segundos < 190.0: return 2.0
+    return 0.0
 
 def aplicar_filtro_passa_baixa(valor_atual, valor_anterior_filtrado, passo_tempo, constante_tempo):
     fator_suavizacao = passo_tempo / (constante_tempo + passo_tempo)
@@ -177,7 +183,7 @@ comando_velocidade_inversor = 0.0
 torque_aerodinamico_referencia_nm = 0.0
 velocidade_vento_atual_m_s = 0.0
 potencia_sensor_filtrada_w = 0.0
-velocidade_angular_sensor_filtrado_nm = 0.0
+velocidade_angular_sensor_filtrado_rad_s = 0.0
 velocidade_angular_alvo_filtrada_rad_s = 0.0
 tensao_armadura_alvo_filtrada_volts = 0.0
 index_vetor_vento = 0
@@ -205,6 +211,7 @@ try:
                 except: 
                     velocidade_vento_atual_m_s = VETOR_VENTO_M_S[index_vetor_vento - 1]
                     index_vetor_vento = 100
+                    
             velocidade_angular_alvo_rad_s = (velocidade_vento_atual_m_s * TSR_IDEAL / RAIO_TURBINA_METROS)
             velocidade_angular_alvo_filtrada_rad_s = aplicar_filtro_passa_baixa(velocidade_angular_alvo_rad_s, velocidade_angular_alvo_filtrada_rad_s, PASSO_SIMULACAO_SEGUNDOS, CONSTANTE_TEMPO_FILTRO_VELOCIDADE_ALVO)
 
@@ -225,11 +232,13 @@ try:
                     tensao_armadura_alvo_filtrada_volts = aplicar_filtro_passa_baixa(tensao_armadura_calculada_volts, tensao_armadura_alvo_filtrada_volts, PASSO_SIMULACAO_SEGUNDOS, CONSTANTE_TEMPO_FILTRO_VELOCIDADE_ALVO)
                     tensao_armadura_alvo_volts = tensao_armadura_alvo_filtrada_volts
 
-            else: 
-                controlador_mppt_velocidade.reset()
-                velocidade_vento_atual_m_s = 0.0 
-                tensao_armadura_alvo_volts = turbina_digital.velocidade_angular_gerador_rad_s * turbina_digital.constante_velocidade_gerador 
+            if velocidade_vento_atual_m_s >= VELOCIDADE_VENTO_MINIMA_M_S:
                 turbina_digital.esta_em_inicializacao = True
+                turbina_digital.velocidade_angular_turbina_rad_s -= INCREMENTO_VELOCIDADE_ANG_SOFTSTART_SIMULACAO_RAD_S
+                tensao_armadura_alvo_volts = turbina_digital.velocidade_angular_gerador_rad_s * turbina_digital.constante_velocidade_gerador
+                tensao_armadura_alvo_filtrada_volts = tensao_armadura_alvo_volts
+                turbina_digital.tensao_armadura_volts = tensao_armadura_alvo_volts 
+                controlador_mppt_velocidade.compute(velocidade_angular_alvo_filtrada_rad_s, turbina_digital.velocidade_angular_turbina_rad_s, PASSO_SIMULACAO_SEGUNDOS, True)
 
             ANGULO_PAS_REFERENCIA_RADIANOS = 0.0
 
@@ -255,9 +264,15 @@ try:
             potencia_real_lida_w = torquimetro_fisico.Potencia_calculated
             velocidade_angular_real_rad_s = torquimetro_fisico.RPM_calibrated * (2.0 * np.pi) / 60.0
 
+            if potencia_real_lida_w < POTENCIA_MECANICA_MAXIMA_W:
+                inversor_motor.SendReferenceAngularVelocity(comando_velocidade_inversor)
+            else:
+                print("Limite de potência atingido na bancada!")
+                break
+
             potencia_sensor_filtrada_w = aplicar_filtro_passa_baixa(potencia_real_lida_w, potencia_sensor_filtrada_w, PASSO_HARDWARE_SEGUNDOS, CONSTANTE_TEMPO_FILTRO_SENSOR_POTENCIA)
-            velocidade_angular_sensor_filtrado_nm = aplicar_filtro_passa_baixa(velocidade_angular_real_rad_s, velocidade_angular_sensor_filtrado_nm, PASSO_HARDWARE_SEGUNDOS, CONSTANTE_TEMPO_FILTRO_SENSOR_VELOCIDADE)
-            torque_aerodinamico_referencia_nm = turbina_digital.calcular_torque_aerodinamico(velocidade_vento_atual_m_s, velocidade_angular_sensor_filtrado_nm / RELACAO_TRANSMISSAO_CAIXA_ENGRENAGENS, 0.0) / RELACAO_TRANSMISSAO_CAIXA_ENGRENAGENS
+            velocidade_angular_sensor_filtrado_rad_s = aplicar_filtro_passa_baixa(velocidade_angular_real_rad_s, velocidade_angular_sensor_filtrado_rad_s, PASSO_HARDWARE_SEGUNDOS, CONSTANTE_TEMPO_FILTRO_SENSOR_VELOCIDADE)
+            torque_aerodinamico_referencia_nm = turbina_digital.calcular_torque_aerodinamico(velocidade_vento_atual_m_s, velocidade_angular_sensor_filtrado_rad_s / RELACAO_TRANSMISSAO_CAIXA_ENGRENAGENS, 0.0) / RELACAO_TRANSMISSAO_CAIXA_ENGRENAGENS
 
             if velocidade_vento_atual_m_s >= VELOCIDADE_VENTO_MINIMA_M_S:
                 if motor_em_soft_start:
@@ -265,19 +280,14 @@ try:
                     if potencia_sensor_filtrada_w >= POTENCIA_EIXO_FIM_SOFT_START_W: 
                         motor_em_soft_start = False
 
-                else:
-                    comando_velocidade_inversor = controlador_seguimento_torque.compute(torque_aerodinamico_referencia_nm, torque_real_lido_nm, PASSO_HARDWARE_SEGUNDOS)
+                else: comando_velocidade_inversor = controlador_seguimento_torque.compute(torque_aerodinamico_referencia_nm, torque_real_lido_nm, PASSO_HARDWARE_SEGUNDOS)
 
-            else: 
-                motor_em_soft_start = True
-                comando_velocidade_inversor = 0.0
+            if velocidade_vento_atual_m_s < VELOCIDADE_VENTO_MINIMA_M_S: 
                 torque_aerodinamico_referencia_nm = 0.0
-            
-            if torquimetro_fisico.Potencia_calculated < POTENCIA_MECANICA_MAXIMA_W:
-                inversor_motor.SendReferenceAngularVelocity(comando_velocidade_inversor)
-            else:
-                print("Limite de potência atingido na bancada!")
-                break
+                controlador_seguimento_torque.compute(torque_aerodinamico_referencia_nm, torque_real_lido_nm, PASSO_HARDWARE_SEGUNDOS)
+                motor_em_soft_start = True
+                comando_velocidade_inversor -= INCREMENTO_VELOCIDADE_ANG_SOFT_START_EIXO_RPM
+
                 
             registros.tempos_hardware_fisico[registros.idx_hw] = tempo_decorrido
             registros.comandos_esforco_inversor[registros.idx_hw] = comando_velocidade_inversor
