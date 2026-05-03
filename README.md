@@ -54,6 +54,7 @@ A robustez da emulação depende da integração direta com os componentes físi
 * **Auto-Detecção Serial**: Varredura automática de portas COM para facilitar a conexão dos dispositivos.
 * **Logger de Dados**: Registro otimizado com `numpy` de todas as variáveis (Torque, RPM, Potência e Erro).
 * **Visualização Dinâmica**: Plotagem em tempo real de Referência vs. Medição Real via `matplotlib`.
+* * **Monitoramento de Latência**: Medição contínua da latência da comunicação serial para garantir a integridade da malha de controle HIL.
 
 -----
 
@@ -82,6 +83,7 @@ O núcleo do emulador opera em malha fechada para garantir que o hardware físic
 | `modelo_aerogerador.py` | Motor de física da turbina e do gerador elétrico. |
 | `pid_module.py` | Lógica de controle PID com proteção de saturação. |
 | `init_serial_devices.py` | Utilitário de inicialização de portas seriais. |
+| `parametros.py` | Definição de constantes físicas, tempos de amostragem e configurações da bancada. |
 
 -----
 
@@ -91,17 +93,38 @@ Abaixo estão os resultados obtidos pela bancada. Para a interpretação correta
 
 O comportamento deste equipamento físico dita a dinâmica de resposta do sistema emulado, como detalhado a seguir.
 
-### 1. Seguimento de Hardware (Torque)
+### 1. Perfil de Vento de Entrada
+<div align="center">
+  <img src="./velocidade_vento_input.svg" alt="Perfil de Vento Simulado" width="700px">
+</div>
+Representa a velocidade do vento ($m/s$) simulada que aciona o modelo aerodinâmico.
+
+### 2. Seguimento de Hardware (Torque)
 
 Validação da capacidade do inversor da bancada (motor) em seguir a referência de torque calculada pelo modelo virtual.
 
-**Análise do Atraso de Extração:** Observa-se uma discrepância inicial entre o torque calculado pelo modelo e o torque medido na planta real. O modelo digital inicia a extração de potência imediatamente; no entanto, o inversor híbrido físico exige um tempo de processamento e estabilização da rede. É possível notar que somente após os 50 segundos o MPPT do inversor "fecha a chave" e começa a extrair potência efetivamente. A partir desse momento, o torque físico sobe e o rastreamento (HIL) converge com alta fidelidade.
+**Análise do Atraso de Extração:** Observa-se uma discrepância inicial entre o torque calculado pelo modelo e o torque medido na planta real. O modelo digital inicia a extração de potência imediatamente; no entanto, o inversor híbrido físico exige um tempo de processamento e estabilização da rede. É possível notar que somente entre os 40 e 50 segundos o MPPT do inversor "fecha a chave" e começa a extrair potência efetivamente. A partir desse momento, o torque físico sobe e o rastreamento (HIL) converge com alta fidelidade.
 
-### 2. Validação de Potência e Velocidade
+<div align="center">
+  <img src="./seguimento_hardware.svg" alt="Seguimento de Hardware" width="700px">
+</div>
+Validação da malha de controle: compara o torque de referência calculado pelo modelo com o torque real medido no eixo.
+
+### 3. & 4. Validação de Potência e Velocidade
 
 Comparação entre as grandezas medidas no sensor físico (Torquímetro T25) e as previstas pela simulação digital contínua.
 
-### 3. Eficiência Aerodinâmica ($C_p$) e Degradação do Modelo
+<div align="center">
+  <img src="./validacao_velocidade_angular.svg" alt="Validação de Velocidade Angular" width="700px">
+</div>
+Demonstra a sincronia entre a velocidade da turbina virtual e a rotação física da bancada.
+
+<div align="center">
+  <img src="./validacao_potencia.svg" alt="Validação de Potência" width="700px">
+</div>
+Comparação da potência produzida no eixo. Fundamental para validar a fidelidade da emulação de energia.
+
+### 5. Eficiência Aerodinâmica ($C_p$) e Degradação do Modelo
 
 Análise do coeficiente de potência ($C_p$) em função da razão de velocidade de ponta ($\lambda$).
 
@@ -109,24 +132,57 @@ Análise do coeficiente de potência ($C_p$) em função da razão de velocidade
 
 Para comprovar o conceito HIL e validar o seguimento, o parametro $\lambda_{opt}$ do modelo matemático virtual foi intencionalmente modificado (degradando a eficiência do "MPPT" virtual). Com essa abordagem, o Gêmeo Digital foi forçado a apresentar o mesmo rendimento subótimo da planta real, demonstrando que a bancada é capaz de emular com precisão o cenário físico real, inclusive suas ineficiências paramétricas.
 
-### 1. Perfil de Vento Simulado
-Perfil de vento gerado e utilizado como input para o Modelo digital e o Emulador.
-![Perfil de Vento Simulado](./Perfil_de_Vento_Simulado.png)
+<div align="center">
+  <img src="./eficiencia_aerodinamica.svg" alt="Eficiência Aerodinâmica" width="700px">
+</div>
+Análise do coeficiente de potência em relação à razão de velocidade de ponta ($\lambda$). Mostra o desempenho do sistema frente ao Limite de Betz.
 
-### 2. Seguimento de Hardware (Torque)
-Validação da capacidade do inversor em seguir a referência de torque calculada pelo modelo estático de eficiência aerodinâmica.
-![Seguimento de Hardware](./Seguimento_de_Hardware.png)
+### 6. Latência da Comunicação Serial
+<div align="center">
+  <img src="./latencia_comunicacao.svg" alt="Latência da Comunicação" width="700px">
+</div>
+Métrica de saúde do sistema HIL, garantindo que as trocas de dados ocorram dentro da janela de tempo real.
 
-### 3. Validação de Potência e Velocidade
-Comparação entre as grandezas medidas no sensor físico e as previstas pela simulação digital.
-![Validação de Potência](./Validação_Potência.png)
-![Validação de Velocidade](./Validação_Velocidade_Angular.png)
+---
 
-### 4. Eficiência Aerodinâmica
-Análise do coeficiente de potência ($C_p$) em função da razão de velocidade de ponta ($\lambda$).
-![Eficiência Aerodinâmica](./Eficiência_Aerodinâmica.png)
+## Configurações Críticas de Controle e Operação
 
------
+A fidelidade da emulação HIL é determinada pelos parâmetros configurados no firmware do emulador. Abaixo estão os valores fundamentais que regem o comportamento dinâmico e a segurança da bancada:
+
+### Parâmetros de Tempo e Amostragem
+Estes tempos definem a frequência de atualização das malhas de controle, sendo cruciais para a estabilidade do método RK4.
+
+| Parâmetro | Valor | Descrição |
+| :--- | :--- | :--- |
+| `PASSO_HARDWARE_SEGUNDOS` | **10 ms** | Intervalo de comunicação serial e atualização do inversor. |
+| `PASSO_SIMULACAO_DIGITAL` | **20 ms** | Passo de integração numérica das equações de física. |
+| `DURACAO_EMULACAO_S` | **150 s** | Tempo total de execução de cada ensaio. |
+
+### Constantes do Sistema de Controle (PID)
+O controle de torque utiliza uma malha de velocidade variável com limites rígidos para evitar danos por sobrecorrente ou esforço mecânico excessivo.
+
+| Parâmetro | Valor | Função no Sistema |
+| :--- | :--- | :--- |
+| `KP`, `KI`, `KD` | **500, 300, 0.0** | Ganhos sintonizados para o seguimento de torque. |
+| `LIMITE_SUPERIOR` | **1000.0 RPM** | Limite superior de saturacao (Anti-Windup). |
+| `LIMITE_INFERIOR` | **0.0 RPM** | Limite inferior de saturacao (Anti-Windup). |
+| `TORQUE_MAX_MOTOR` | **79.63 Nm** | Limite físico de segurança do motor de indução. |
+| `TAU_FILTRO_U_INVERSOR` | **0.1 s** | Constante tempo do filtro passa-baixa que filtra o sinal de controle. |
+
+### Dinâmica do Gêmeo Digital
+Valores que definem as propriedades físicas da turbina virtual que está sendo emulada no eixo real.
+
+| Parâmetro | Valor | Importância |
+| :--- | :--- | :--- |
+| `RAIO_TURBINA_METROS` | **2.5 m** | Determina a captação de energia e o torque aerodinâmico. |
+| `RELACAO_TRANSMISSAO` | **4.0** | Multiplicação de velocidade entre a turbina e o gerador. |
+| `INERCIA_TURBINA` | **0.10 kg·m²** | Define a resposta transiente à variação da velocidade do vento. |
+| `TSR_IDEAL` ($\lambda$) | **9.5** | Ponto de operação para máxima eficiência (MPPT). |
+
+### Segurança e Inicialização (Soft-Start)
+Para proteger o transdutor de torque de alta precisão contra picos de torque inercial na partida:
+* **Velocidade Alvo de Partida:** O sistema acelera até atingir **80%** da velocidade de operação prevista antes de fechar a malha de controle dinâmico.
+* **Rampa de Aceleração:** Incrementos graduais de **0.045 rad/s** são aplicados durante a fase de inicialização para garantir uma transição suave.
 
 ## Contato
 

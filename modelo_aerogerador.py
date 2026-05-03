@@ -127,7 +127,9 @@ class TurbinaVirtual:
     def executar_passo_simulacao(self, velocidade_vento_m_s, tensao_armadura_alvo_volts, angulo_pas_alvo_radianos, passo_tempo_segundos):
         variacao_maxima_tensao = self.taxa_variacao_tensao_armadura_v_s * passo_tempo_segundos
         diferenca_tensao = tensao_armadura_alvo_volts - self.tensao_armadura_anterior_volts
-        self.tensao_armadura_volts = self.tensao_armadura_anterior_volts + np.clip(diferenca_tensao, -variacao_maxima_tensao, variacao_maxima_tensao)
+
+        if self.esta_em_inicializacao: self.tensao_armadura_volts = self.tensao_armadura_anterior_volts + diferenca_tensao
+        else: self.tensao_armadura_volts = self.tensao_armadura_anterior_volts + np.clip(diferenca_tensao, -variacao_maxima_tensao, variacao_maxima_tensao)
         self.tensao_armadura_anterior_volts = self.tensao_armadura_volts
 
         variacao_maxima_angulo = self.taxa_variacao_angulo_pas_rad_s * passo_tempo_segundos
