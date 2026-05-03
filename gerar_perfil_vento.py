@@ -20,7 +20,7 @@ def gerar_vento_dia_normal(t, tempo, h):
     return max(0, v_final), v_base
 
 # Parâmetros da simulação
-tempo_total = 60*3  # segundos
+tempo_total = 150  # segundos
 h = 0.02           # passo de tempo
 t_vetor = np.arange(0, tempo_total + h, h)
 
