@@ -93,15 +93,36 @@ Abaixo estão os resultados obtidos pela bancada. Para a interpretação correta
 
 O comportamento deste equipamento físico dita a dinâmica de resposta do sistema emulado, como detalhado a seguir.
 
+### 1. Perfil de Vento de Entrada
+Representa a velocidade do vento ($m/s$) simulada que aciona o modelo aerodinâmico.
+<div align="center">
+  <img src="./velocidade_vento_input.svg" alt="Perfil de Vento Simulado" width="700px">
+</div>
+
 ### 2. Seguimento de Hardware (Torque)
 
 Validação da capacidade do inversor da bancada (motor) em seguir a referência de torque calculada pelo modelo virtual.
 
 **Análise do Atraso de Extração:** Observa-se uma discrepância inicial entre o torque calculado pelo modelo e o torque medido na planta real. O modelo digital inicia a extração de potência imediatamente; no entanto, o inversor híbrido físico exige um tempo de processamento e estabilização da rede. É possível notar que somente após os 50 segundos o MPPT do inversor "fecha a chave" e começa a extrair potência efetivamente. A partir desse momento, o torque físico sobe e o rastreamento (HIL) converge com alta fidelidade.
 
+Validação da malha de controle: compara o torque de referência calculado pelo modelo com o torque real medido no eixo.
+<div align="center">
+  <img src="./seguimento_hardware.svg" alt="Seguimento de Hardware" width="700px">
+</div>
+
 ### 3. & 4. Validação de Potência e Velocidade
 
 Comparação entre as grandezas medidas no sensor físico (Torquímetro T25) e as previstas pela simulação digital contínua.
+
+Demonstra a sincronia entre a velocidade da turbina virtual e a rotação física da bancada.
+<div align="center">
+  <img src="./validacao_velocidade_angular.svg" alt="Validação de Velocidade Angular" width="700px">
+</div>
+
+Comparação da potência produzida no eixo. Fundamental para validar a fidelidade da emulação de energia.
+<div align="center">
+  <img src="./validacao_potencia.svg" alt="Validação de Potência" width="700px">
+</div>
 
 ### 5. Eficiência Aerodinâmica ($C_p$) e Degradação do Modelo
 
@@ -111,31 +132,6 @@ Análise do coeficiente de potência ($C_p$) em função da razão de velocidade
 
 Para comprovar o conceito HIL e validar o seguimento, o parametro $\lambda_{opt}$ do modelo matemático virtual foi intencionalmente modificado (degradando a eficiência do "MPPT" virtual). Com essa abordagem, o Gêmeo Digital foi forçado a apresentar o mesmo rendimento subótimo da planta real, demonstrando que a bancada é capaz de emular com precisão o cenário físico real, inclusive suas ineficiências paramétricas.
 
-### 1. Perfil de Vento de Entrada
-Representa a velocidade do vento ($m/s$) simulada que aciona o modelo aerodinâmico.
-<div align="center">
-  <img src="./velocidade_vento_input.svg" alt="Perfil de Vento Simulado" width="700px">
-</div>
-
-### 2. Seguimento de Hardware (Torque)
-Validação da malha de controle: compara o torque de referência calculado pelo modelo com o torque real medido no eixo.
-<div align="center">
-  <img src="./seguimento_hardware.svg" alt="Seguimento de Hardware" width="700px">
-</div>
-
-### 3. Validação de Velocidade Angular
-Demonstra a sincronia entre a velocidade da turbina virtual e a rotação física da bancada.
-<div align="center">
-  <img src="./validacao_velocidade_angular.svg" alt="Validação de Velocidade Angular" width="700px">
-</div>
-
-### 4. Validação de Potência Mecânica
-Comparação da potência produzida no eixo. Fundamental para validar a fidelidade da emulação de energia.
-<div align="center">
-  <img src="./validacao_potencia.svg" alt="Validação de Potência" width="700px">
-</div>
-
-### 5. Eficiência Aerodinâmica ($C_p$)
 Análise do coeficiente de potência em relação à razão de velocidade de ponta ($\lambda$). Mostra o desempenho do sistema frente ao Limite de Betz.
 <div align="center">
   <img src="./eficiencia_aerodinamica.svg" alt="Eficiência Aerodinâmica" width="700px">
