@@ -156,17 +156,18 @@ Estes tempos definem a frequência de atualização das malhas de controle, send
 | :--- | :--- | :--- |
 | `PASSO_HARDWARE_SEGUNDOS` | **10 ms** | Intervalo de comunicação serial e atualização do inversor. |
 | `PASSO_SIMULACAO_DIGITAL` | **20 ms** | Passo de integração numérica das equações de física. |
-| `DURACAO_EMULACAO_S` | **120 s** | Tempo total de execução de cada ensaio. |
+| `DURACAO_EMULACAO_S` | **150 s** | Tempo total de execução de cada ensaio. |
 
 ### Constantes do Sistema de Controle (PID)
 O controle de torque utiliza uma malha de velocidade variável com limites rígidos para evitar danos por sobrecorrente ou esforço mecânico excessivo.
 
 | Parâmetro | Valor | Função no Sistema |
 | :--- | :--- | :--- |
-| `KP`, `KI`, `KD` | **0.5, 3.5, 0.0** | Ganhos sintonizados para o seguimento de torque. |
-| `LIMITE_INTEGRAL` | **200.0** | Teto para o erro acumulado (Anti-Windup). |
+| `KP`, `KI`, `KD` | **500, 300, 0.0** | Ganhos sintonizados para o seguimento de torque. |
+| `LIMITE_SUPERIOR` | **1000.0 RPM** | Limite superior de saturacao (Anti-Windup). |
+| `LIMITE_SUPERIOR` | **0.0 RPM** | Limite inferior de saturacao (Anti-Windup). |
 | `TORQUE_MAX_MOTOR` | **79.63 Nm** | Limite físico de segurança do motor de indução. |
-| `TENSAO_MAX_INVERSOR`| **300 V** | Limite superior de saída para o acionamento. |
+| `TAU_FILTRO_U_INVERSOR` | **0.1 s** | Constante tempo do filtro passa-baixa que filtra o sinal de controle. |
 
 ### Dinâmica do Gêmeo Digital
 Valores que definem as propriedades físicas da turbina virtual que está sendo emulada no eixo real.
