@@ -145,6 +145,44 @@ Métrica de saúde do sistema HIL, garantindo que as trocas de dados ocorram den
 
 ---
 
+## Configurações Críticas de Controle e Operação
+
+A fidelidade da emulação HIL é determinada pelos parâmetros configurados no firmware do emulador. Abaixo estão os valores fundamentais que regem o comportamento dinâmico e a segurança da bancada:
+
+### Parâmetros de Tempo e Amostragem
+Estes tempos definem a frequência de atualização das malhas de controle, sendo cruciais para a estabilidade do método RK4.
+
+| Parâmetro | Valor | Descrição |
+| :--- | :--- | :--- |
+| `PASSO_HARDWARE_SEGUNDOS` | **10 ms** | Intervalo de comunicação serial e atualização do inversor. |
+| `PASSO_SIMULACAO_DIGITAL` | **20 ms** | Passo de integração numérica das equações de física. |
+| `DURACAO_EMULACAO_S` | **120 s** | Tempo total de execução de cada ensaio. |
+
+### Constantes do Sistema de Controle (PID)
+O controle de torque utiliza uma malha de velocidade variável com limites rígidos para evitar danos por sobrecorrente ou esforço mecânico excessivo.
+
+| Parâmetro | Valor | Função no Sistema |
+| :--- | :--- | :--- |
+| `KP`, `KI`, `KD` | **0.5, 3.5, 0.0** | Ganhos sintonizados para o seguimento de torque. |
+| `LIMITE_INTEGRAL` | **200.0** | Teto para o erro acumulado (Anti-Windup). |
+| `TORQUE_MAX_MOTOR` | **79.63 Nm** | Limite físico de segurança do motor de indução. |
+| `TENSAO_MAX_INVERSOR`| **300 V** | Limite superior de saída para o acionamento. |
+
+### Dinâmica do Gêmeo Digital
+Valores que definem as propriedades físicas da turbina virtual que está sendo emulada no eixo real.
+
+| Parâmetro | Valor | Importância |
+| :--- | :--- | :--- |
+| `RAIO_TURBINA_METROS` | **2.5 m** | Determina a captação de energia e o torque aerodinâmico. |
+| `RELACAO_TRANSMISSAO` | **4.0** | Multiplicação de velocidade entre a turbina e o gerador. |
+| `INERCIA_TURBINA` | **0.10 kg·m²** | Define a resposta transiente à variação da velocidade do vento. |
+| `TSR_IDEAL` ($\lambda$) | **9.5** | Ponto de operação para máxima eficiência (MPPT). |
+
+### Segurança e Inicialização (Soft-Start)
+Para proteger o transdutor de torque de alta precisão contra picos de torque inercial na partida:
+* **Velocidade Alvo de Partida:** O sistema acelera até atingir **80%** da velocidade de operação prevista antes de fechar a malha de controle dinâmico.
+* **Rampa de Aceleração:** Incrementos graduais de **0.045 rad/s** são aplicados durante a fase de inicialização para garantir uma transição suave.
+
 ## Contato
 
 * **Isaque Verona** - [GitHub Profile](https://github.com/isaqueveron)
