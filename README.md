@@ -54,6 +54,7 @@ A robustez da emulação depende da integração direta com os componentes físi
 * **Auto-Detecção Serial**: Varredura automática de portas COM para facilitar a conexão dos dispositivos.
 * **Logger de Dados**: Registro otimizado com `numpy` de todas as variáveis (Torque, RPM, Potência e Erro).
 * **Visualização Dinâmica**: Plotagem em tempo real de Referência vs. Medição Real via `matplotlib`.
+* * **Monitoramento de Latência**: Medição contínua da latência da comunicação serial para garantir a integridade da malha de controle HIL.
 
 -----
 
@@ -82,6 +83,7 @@ O núcleo do emulador opera em malha fechada para garantir que o hardware físic
 | `modelo_aerogerador.py` | Motor de física da turbina e do gerador elétrico. |
 | `pid_module.py` | Lógica de controle PID com proteção de saturação. |
 | `init_serial_devices.py` | Utilitário de inicialização de portas seriais. |
+| `parametros.py` | Definição de constantes físicas, tempos de amostragem e configurações da bancada. |
 
 -----
 
@@ -110,21 +112,25 @@ Análise do coeficiente de potência ($C_p$) em função da razão de velocidade
 Para comprovar o conceito HIL e validar o seguimento, o parametro $\lambda_{opt}$ do modelo matemático virtual foi intencionalmente modificado (degradando a eficiência do "MPPT" virtual). Com essa abordagem, o Gêmeo Digital foi forçado a apresentar o mesmo rendimento subótimo da planta real, demonstrando que a bancada é capaz de emular com precisão o cenário físico real, inclusive suas ineficiências paramétricas.
 
 ### 1. Perfil de Vento Simulado
-Perfil de vento gerado e utilizado como input para o Modelo digital e o Emulador.
-![Perfil de Vento Simulado](./Perfil_de_Vento_Simulado.png)
+Perfil de vento gerado (padrão 'NATURAL' ou 'ESCADA') e utilizado como input para o Modelo digital e o Emulador.
+![Perfil de Vento Simulado](./velocidade_vento_input.svg)
 
-### 2. Seguimento de Hardware (Torque)
-Validação da capacidade do inversor em seguir a referência de torque calculada pelo modelo estático de eficiência aerodinâmica.
-![Seguimento de Hardware](./Seguimento_de_Hardware.png)
+### 2. Seguimento de Hardware (Torque e Esforço de Controle)
+Validação da capacidade do inversor da bancada em seguir a referência de torque calculada pelo modelo virtual, destacando também o esforço de controle enviado ao inversor.
+![Seguimento de Hardware](./seguimento_hardware.svg)
 
-### 3. Validação de Potência e Velocidade
-Comparação entre as grandezas medidas no sensor físico e as previstas pela simulação digital.
-![Validação de Potência](./Validação_Potência.png)
-![Validação de Velocidade](./Validação_Velocidade_Angular.png)
+### 3. Validação de Potência e Velocidade Angular
+Comparação entre as grandezas medidas no sensor físico (Torquímetro T25) e as previstas pela simulação digital contínua.
+![Validação de Potência](./validacao_potencia.svg)
+![Validação de Velocidade Angular](./validacao_velocidade_angular.svg)
 
-### 4. Eficiência Aerodinâmica
-Análise do coeficiente de potência ($C_p$) em função da razão de velocidade de ponta ($\lambda$).
-![Eficiência Aerodinâmica](./Eficiência_Aerodinâmica.png)
+### 4. Eficiência Aerodinâmica ($C_p$)
+Análise do coeficiente de potência ($C_p$) real vs. modelo. Os dados demonstram a operação do algoritmo de MPPT frente ao Limite de Betz e à degradação programada do modelo matemático virtual para adequação com a planta física.
+![Eficiência Aerodinâmica](./eficiencia_aerodinamica.svg)
+
+### 5. Latência da Comunicação Serial
+Avaliação do tempo de resposta das requisições via Modbus/Serial com o hardware da bancada para assegurar o determinismo da malha de 10ms.
+![Latência da Comunicação](./latencia_comunicacao.svg)
 
 -----
 
