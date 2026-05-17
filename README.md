@@ -47,7 +47,7 @@ A robustez da emulação depende da integração direta com os componentes físi
 * **Dinâmica de Transmissão**: Modelagem incluindo inércia da turbina, inércia do gerador, relação de caixa de engrenagens, parametros eletricos do gerador e coeficientes de atrito dinâmico.
 
 ### 2. Sincronização HIL e Multimalhas de Tempo
-* **Multimalhas de Tempo**: O sistema opera com duas malhas temporais distintas e sincronizadas: uma Malha Digital (20ms), responsável por resolver a física da turbina via Runge-Kutta, e uma Malha de Hardware (1ms), dedicada à comunicação serial e controle de torque.
+* **Multimalhas de Tempo**: O sistema opera com duas malhas temporais distintas e sincronizadas: uma Malha Digital (20ms), responsável por resolver a física da turbina via Runge-Kutta, e uma Malha de Hardware (10ms), dedicada à comunicação serial e controle de torque.
 * **Sincronização HIL**: A estratégia de tempo real é garantida pelo uso de cronômetros de alta precisão que gerenciam o thread principal, assegurando que o processamento matemático e as chamadas de I/O (inversor e torquímetro) ocorram dentro de janelas temporais fixas, evitando o acúmulo de atrasos (jitter) e garantindo o determinismo necessário para a emulação HIL.
 
 ### 3. Interface e Logs
